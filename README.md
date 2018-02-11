@@ -1,5 +1,3 @@
-[![npm version](https://badge.fury.io/js/homebridge-switcheroo.svg)](https://badge.fury.io/js/homebridge-switcheroo)
-
 # homebridge-switcheroo-webos
 [homebridge-switcheroo](https://badge.fury.io/js/homebridge-switcheroo) adapted for WebOS TVs
 
