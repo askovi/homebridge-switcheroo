@@ -1,5 +1,6 @@
 'use strict';
 
+var lgtv;
 var Service;
 var Characteristic;
 var request = require('request');
@@ -40,6 +41,24 @@ function Switcheroo(log, config) {
         default:
             throw new Error('Unknown homebridge-switcheroo switch type');
     }
+    this.url = 'ws://' + this.host + ':3000';
+    this.keyFile = config['keyFile'];
+    lgtv = require('lgtv2')({
+    url: this.url,
+    timeout: 5000,
+    reconnect: 3000,
+    keyFile: this.keyFile
+  });
+
+    var self = this;
+
+    lgtv.on('connect', function() {
+    self.log('webOS3 connected to TV');
+    self.connected = true;
+    if(!self.checkAliveInterval && self.pollingEnabled) {
+      self.checkAliveInterval = setInterval(self.checkTVState.bind(self, self.pollCallback.bind(self)), self.alivePollingInterval);
+    }
+  });
 }
 
 Switcheroo.prototype = {
@@ -88,7 +107,8 @@ Switcheroo.prototype = {
                     if (i === 0) return; // skip informationService at index 0
 
                     if (targetService.subtype === switchService.subtype) { // turn on
-                        reqUrl = this.host + this.multiswitch[i-1].path;
+                        //lgtv.request('ssap://tv/switchInput', {inputId: this.multiswitch[i-1].path});
+                        reqUrl = this.multiswitch[i-1].path;
                         switchService.getCharacteristic(Characteristic.On).setValue(true, undefined, funcContext);
                     } else { // turn off
                         switchService.getCharacteristic(Characteristic.On).setValue(false, undefined, funcContext);
@@ -100,7 +120,7 @@ Switcheroo.prototype = {
                 this.log('Unknown homebridge-switcheroo type in setPowerState');
         }
 
-        this.httpRequest(reqUrl, reqBody, this.httpMethod, this.username, this.password, this.sendImmediately, function(error, response, responseBody) {
+        lgtv.request('ssap://tv/switchInput', {inputId: reqUrl}, function(error, response, responseBody) {
             if (error) {
                 this.log.error('setPowerState failed: ' + error.message);
                 this.log('response: ' + response + '\nbody: ' + responseBody);

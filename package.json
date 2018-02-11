@@ -17,7 +17,7 @@
     "button",
     "http",
     "control",
-    "homekit", 
+    "homekit",
     "smarthome"
   ],
   "main": "index.js",
@@ -26,7 +26,10 @@
     "homebridge": ">=0.2.0"
   },
   "dependencies": {
-    "request": "^2.65.0"
+    "request": "^2.65.0",
+    "lgtv2": "^1.4.1",
+    "tcp-ping": "^0.1.1",
+    "wake_on_lan": "^0.0.4"
   },
   "bugs": {
     "url": "https://github.com/chriszelazo/homebridge-switcheroo/issues"
